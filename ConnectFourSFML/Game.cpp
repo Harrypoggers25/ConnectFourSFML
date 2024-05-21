@@ -1,4 +1,8 @@
 #include "Game.h"
+#include <iostream>
+
+#define OFFSET_X 65
+#define OFFSET_Y 200
 
 void Game::run()
 {
@@ -34,15 +38,20 @@ void Game::init()
 
 	this->t[0]->loadFromFile("Images/bg.png");
 	this->bg = new sf::Sprite(*this->t[0]);
+	this->bg->setPosition(OFFSET_X, OFFSET_Y);
 
 	this->t[1]->loadFromFile("Images/fg.png");
 	this->fg = new sf::Sprite(*this->t[1]);
+	this->fg->setPosition(OFFSET_X, OFFSET_Y);
 
 	this->t[2]->loadFromFile("Images/red.png");
 	this->red = new sf::Sprite(*this->t[2]);
 
 	this->t[3]->loadFromFile("Images/yellow.png");
 	this->yellow = new sf::Sprite(*this->t[3]);
+
+	this->highlight = new sf::RectangleShape(sf::Vector2f(0, 0));
+	this->highlight->setFillColor(sf::Color(255, 255, 255, 50));
 }
 
 void Game::updateEvent()
@@ -50,6 +59,16 @@ void Game::updateEvent()
 	sf::Event event;
 	while (this->window->pollEvent(event)) {
 		if (event.type == sf::Event::Closed) this->window->close();
+		if (event.type == sf::Event::MouseMoved) {
+			sf::Vector2i mousePos = sf::Mouse::getPosition(*this->window);
+			if (mousePos.x >= OFFSET_X && mousePos.x < 700 + OFFSET_X && 
+				mousePos.y >= OFFSET_Y && mousePos.y < 600 + OFFSET_Y) {
+				this->highlight->setSize(sf::Vector2f(100.f, 600.f));
+				this->highlight->setPosition((float)((mousePos.x - OFFSET_X) / 100 * 100 + OFFSET_X), OFFSET_Y);
+			}
+			else this->highlight->setSize(sf::Vector2f(0, 0));
+		}
+		if (event.type == sf::Event::MouseLeft) this->highlight->setSize(sf::Vector2f(0, 0));
 	}
 }
 
@@ -63,6 +82,7 @@ void Game::render()
 	
 	this->window->draw(*this->bg);
 	this->window->draw(*this->fg);
+	this->window->draw(*this->highlight);
 
 	this->window->display();
 }

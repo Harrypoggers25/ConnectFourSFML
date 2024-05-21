@@ -15,6 +15,7 @@ private:
 	sf::Sprite* fg;
 	sf::Sprite* red;
 	sf::Sprite* yellow;
+	sf::RectangleShape* highlight;
 
 	void init();
 	void updateEvent();
