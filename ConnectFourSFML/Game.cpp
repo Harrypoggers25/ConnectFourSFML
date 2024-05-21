@@ -1,7 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
-#define OFFSET_X 65
+#define OFFSET_X 50
 #define OFFSET_Y 200
 
 void Game::run()
@@ -52,6 +52,8 @@ void Game::init()
 
 	this->highlight = new sf::RectangleShape(sf::Vector2f(0, 0));
 	this->highlight->setFillColor(sf::Color(255, 255, 255, 50));
+
+	this->turn = false; // False = Red; True = Yellow
 }
 
 void Game::updateEvent()
@@ -69,6 +71,23 @@ void Game::updateEvent()
 			else this->highlight->setSize(sf::Vector2f(0, 0));
 		}
 		if (event.type == sf::Event::MouseLeft) this->highlight->setSize(sf::Vector2f(0, 0));
+		if (event.type == sf::Event::MouseButtonPressed) {
+			sf::Vector2i mousePos = sf::Mouse::getPosition(*this->window);
+			if (mousePos.x >= OFFSET_X && mousePos.x < 700 + OFFSET_X &&
+				mousePos.y >= OFFSET_Y && mousePos.y < 600 + OFFSET_Y) {
+				unsigned short int col = (mousePos.x - OFFSET_X) / 100;
+				
+				//bool oldTurn = turn;
+				for (int i = 0; i < 6; i++) {
+					if (grid[i][col] == 0) {
+						grid[i][col] = turn == false ? 1 : 2;
+						turn = !turn;
+						break;
+					}
+				}
+				//if (oldTurn == turn)
+			}
+		}
 	}
 }
 
@@ -81,6 +100,21 @@ void Game::render()
 	this->window->clear();
 	
 	this->window->draw(*this->bg);
+	
+	for (size_t i = 0; i < 6; i++) {
+		for (size_t j = 0; j < 7; j++) {
+			size_t y = 5 - i;
+			if (this->grid[i][j] == 1) {
+				this->red->setPosition(j * 100 + OFFSET_X, y * 100 + OFFSET_Y);
+				this->window->draw(*this->red);
+			}
+			else if (this->grid[i][j] == 2) {
+				this->yellow->setPosition(j * 100 + OFFSET_X, y * 100 + OFFSET_Y);
+				this->window->draw(*this->yellow);
+			}
+		}
+	}
+
 	this->window->draw(*this->fg);
 	this->window->draw(*this->highlight);
 

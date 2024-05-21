@@ -17,6 +17,9 @@ private:
 	sf::Sprite* yellow;
 	sf::RectangleShape* highlight;
 
+	unsigned short int grid[6][7];
+	bool turn;
+
 	void init();
 	void updateEvent();
 	void update();
