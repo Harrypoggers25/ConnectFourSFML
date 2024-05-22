@@ -10,15 +10,17 @@ public:
 
 private:
 	sf::RenderWindow* window;
-	sf::Texture* t[4];
+	sf::Texture* t[3];
 	sf::Sprite* bg;
 	sf::Sprite* fg;
 	sf::Sprite* red;
 	sf::Sprite* yellow;
+	sf::Sprite* ghost;
 	sf::RectangleShape* highlight;
 
 	unsigned short int grid[6][7];
 	bool turn;
+	bool highlighted;
 
 	void init();
 	void updateEvent();

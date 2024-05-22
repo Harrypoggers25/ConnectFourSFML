@@ -18,7 +18,7 @@ Game::~Game()
 {
 	delete this->window;
 
-	for (size_t i = 0; i < 4; i++) delete this->t[i];
+	for (size_t i = 0; i < 3; i++) delete this->t[i];
 
 	delete this->bg;
 	delete this->fg;
@@ -34,7 +34,7 @@ void Game::init()
 		sf::Style::Titlebar | sf::Style::Close
 	);
 
-	for (size_t i = 0; i < 4; i++) this->t[i] = new sf::Texture();
+	for (size_t i = 0; i < 3; i++) this->t[i] = new sf::Texture();
 
 	this->t[0]->loadFromFile("Images/bg.png");
 	this->bg = new sf::Sprite(*this->t[0]);
@@ -44,16 +44,22 @@ void Game::init()
 	this->fg = new sf::Sprite(*this->t[1]);
 	this->fg->setPosition(OFFSET_X, OFFSET_Y);
 
-	this->t[2]->loadFromFile("Images/red.png");
+	this->t[2]->loadFromFile("Images/chips.png");
+
 	this->red = new sf::Sprite(*this->t[2]);
+	this->red->setTextureRect(sf::IntRect(0, 0, 100, 100));
 
-	this->t[3]->loadFromFile("Images/yellow.png");
-	this->yellow = new sf::Sprite(*this->t[3]);
+	this->yellow = new sf::Sprite(*this->t[2]);
+	this->yellow->setTextureRect(sf::IntRect(100, 0, 100, 100));
 
-	this->highlight = new sf::RectangleShape(sf::Vector2f(0, 0));
+	this->ghost = new sf::Sprite(*this->t[2]);
+	this->ghost->setTextureRect(sf::IntRect(0, 0, 100, 100));
+
+	this->highlight = new sf::RectangleShape(sf::Vector2f(100.f, 600.f));
 	this->highlight->setFillColor(sf::Color(255, 255, 255, 50));
 
 	this->turn = false; // False = Red; True = Yellow
+	this->highlighted = false;
 }
 
 void Game::updateEvent()
@@ -65,12 +71,15 @@ void Game::updateEvent()
 			sf::Vector2i mousePos = sf::Mouse::getPosition(*this->window);
 			if (mousePos.x >= OFFSET_X && mousePos.x < 700 + OFFSET_X && 
 				mousePos.y >= OFFSET_Y && mousePos.y < 600 + OFFSET_Y) {
-				this->highlight->setSize(sf::Vector2f(100.f, 600.f));
-				this->highlight->setPosition((float)((mousePos.x - OFFSET_X) / 100 * 100 + OFFSET_X), OFFSET_Y);
+				float x = (float)((mousePos.x - OFFSET_X) / 100 * 100 + OFFSET_X);
+				this->highlighted = true;
+
+				this->highlight->setPosition(x, (float)OFFSET_Y);
+				this->ghost->setPosition(x, (float)(OFFSET_Y - 100));
 			}
-			else this->highlight->setSize(sf::Vector2f(0, 0));
+			else this->highlighted = false;
 		}
-		if (event.type == sf::Event::MouseLeft) this->highlight->setSize(sf::Vector2f(0, 0));
+		if (event.type == sf::Event::MouseLeft) this->highlighted = false;
 		if (event.type == sf::Event::MouseButtonPressed) {
 			sf::Vector2i mousePos = sf::Mouse::getPosition(*this->window);
 			if (mousePos.x >= OFFSET_X && mousePos.x < 700 + OFFSET_X &&
@@ -82,6 +91,7 @@ void Game::updateEvent()
 					if (grid[i][col] == 0) {
 						grid[i][col] = turn == false ? 1 : 2;
 						turn = !turn;
+						this->ghost->setTextureRect(sf::IntRect(turn == false ? 0 : 100, 0, 100, 100));
 						break;
 					}
 				}
@@ -116,7 +126,10 @@ void Game::render()
 	}
 
 	this->window->draw(*this->fg);
-	this->window->draw(*this->highlight);
+	if (this->highlighted) {
+		this->window->draw(*this->ghost);
+		this->window->draw(*this->highlight);
+	}
 
 	this->window->display();
 }

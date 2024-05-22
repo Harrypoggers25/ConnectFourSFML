@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\bg.png" />
+    <Image Include="Images\chips.png" />
     <Image Include="Images\fg.png" />
     <Image Include="Images\red.png" />
     <Image Include="Images\yellow.png" />
