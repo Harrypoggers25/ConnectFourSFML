@@ -96,6 +96,71 @@ void Game::updateEvent()
 					}
 				}
 				//if (oldTurn == turn)
+
+				auto checkWin = [](const unsigned short int grid[6][7]) {
+					auto checkLine = [](const std::string& str) {
+						return str.find("1111") != std::string::npos || str.find("2222") != std::string::npos;
+					};
+
+					// Check vertical
+					for (size_t j = 0; j < 7; j++) {
+						if (grid[0][j] == 0) continue;	// Row empty
+						std::string str =
+							std::to_string(grid[0][j]) +
+							std::to_string(grid[1][j]) +
+							std::to_string(grid[2][j]) +
+							std::to_string(grid[3][j]) +
+							std::to_string(grid[4][j]) +
+							std::to_string(grid[5][j]);
+						if (str.find("000") != std::string::npos) continue; // Impossible win
+						if (checkLine(str)) return true;
+					}
+
+					// Check horizontal
+					for (size_t i = 0; i < 6; i++) {
+						std::string str =
+							std::to_string(grid[i][0]) +
+							std::to_string(grid[i][1]) +
+							std::to_string(grid[i][2]) +
+							std::to_string(grid[i][3]) +
+							std::to_string(grid[i][4]) +
+							std::to_string(grid[i][5]) +
+							std::to_string(grid[i][6]);
+						if (str.find("0000") != std::string::npos) break; // Impossible win
+						if (checkLine(str)) return true;
+					}
+
+					// Check diagonals
+					// Down-right diagonals
+					for (int i = 0; i <= 2; ++i) {
+						for (int j = 0; j <= 3; ++j) {
+							std::string str;
+							for (int k = 0; k < 4; ++k) {
+								str += std::to_string(grid[i + k][j + k]);
+							}
+							if (checkLine(str)) {
+								return true;
+							}
+						}
+					}
+
+					// Up-right diagonals
+					for (int i = 3; i < 6; ++i) {
+						for (int j = 0; j <= 3; ++j) {
+							std::string str;
+							for (int k = 0; k < 4; ++k) {
+								str += std::to_string(grid[i - k][j + k]);
+							}
+							if (checkLine(str)) {
+								return true;
+							}
+						}
+					}
+
+					return false;
+				};
+				
+				if (checkWin(this->grid)) std::cout << "You win !" << std::endl;
 			}
 		}
 	}
